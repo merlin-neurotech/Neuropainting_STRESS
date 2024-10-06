@@ -116,6 +116,25 @@ def clf(clf_input, clb_info):
  
     return label
 
+def calculate_z_score(eeg):
+    mean_eeg = np.mean(eeg)
+    std_eeg = np.std(eeg)
+    z_score = (eeg - mean_eeg)/std_eeg
+    return z_score
+
+def remove_outliers(eeg, threshold=2):   # Makes a seperate array without the outliers
+    z_score = calculate_z_score(eeg)
+    return [value for value, z in zip(eeg, z_score) if abs(z) <= threshold]
+
+EEG1 = remove_outliers(EEG1)
+EEG2 = remove_outliers(EEG2)
+EEG3 = remove_outliers(EEG3)
+EEG4 = remove_outliers(EEG4)
+EEG5 = remove_outliers(EEG5)
+EEG6 = remove_outliers(EEG6)
+EEG7 = remove_outliers(EEG7)
+EEG8 = remove_outliers(EEG8)
+
 def plot_waves(x, EEG):
     names = ['EEG1','EEG2','EEG3','EEG4','EEG5','EEG6','EEG7','EEG8']
     plt.figure()
@@ -213,6 +232,22 @@ def generate_painting(health, num_shapes):
 streams1 = resolve_stream("name='Unicorn'")
 inlet = StreamInlet(streams1[0])
 stream = streams.lsl_stream(inlet, buffer_length=1024)
+
+# Code for the pushing of the prompt to dall-e-3
+
+# user_prompt = input("")
+
+# response = openai.images.generate(
+#        model = 'dall-e-3',
+#        prompt = user_prompt,
+#        n=1,
+#        size="1024x1024"
+#    )
+
+# image_url = response['data'][0]['url']
+# img_response = requests.get(image_url)
+# generated_image = Image.open(BytesIO(img_response.content))
+# image.show() 
 
 def intro(q1, prompt):
     messages = [
