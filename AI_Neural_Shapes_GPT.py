@@ -116,25 +116,6 @@ def clf(clf_input, clb_info):
  
     return label
 
-def calculate_z_score(eeg):
-    mean_eeg = np.mean(eeg)
-    std_eeg = np.std(eeg)
-    z_score = (eeg - mean_eeg)/std_eeg
-    return z_score
-
-def remove_outliers(eeg, threshold=2):   # Makes a seperate array without the outliers
-    z_score = calculate_z_score(eeg)
-    return [value for value, z in zip(eeg, z_score) if abs(z) <= threshold]
-
-EEG1 = remove_outliers(EEG1)
-EEG2 = remove_outliers(EEG2)
-EEG3 = remove_outliers(EEG3)
-EEG4 = remove_outliers(EEG4)
-EEG5 = remove_outliers(EEG5)
-EEG6 = remove_outliers(EEG6)
-EEG7 = remove_outliers(EEG7)
-EEG8 = remove_outliers(EEG8)
-
 def plot_waves(x, EEG):
     names = ['EEG1','EEG2','EEG3','EEG4','EEG5','EEG6','EEG7','EEG8']
     plt.figure()
@@ -233,22 +214,6 @@ streams1 = resolve_stream("name='Unicorn'")
 inlet = StreamInlet(streams1[0])
 stream = streams.lsl_stream(inlet, buffer_length=1024)
 
-# Code for the pushing of the prompt to dall-e-3
-
-# user_prompt = input("")
-
-# response = openai.images.generate(
-#        model = 'dall-e-3',
-#        prompt = user_prompt,
-#        n=1,
-#        size="1024x1024"
-#    )
-
-# image_url = response['data'][0]['url']
-# img_response = requests.get(image_url)
-# generated_image = Image.open(BytesIO(img_response.content))
-# image.show() 
-
 def intro(q1, prompt):
     messages = [
                 {"role": "system", "content": "You have just asked me the following question: " + q1 + ". Provide a short reply to the users input without asking a follow up question. Type it out slowly."},
@@ -260,18 +225,18 @@ def intro(q1, prompt):
 
     print(response.choices[0].message["content"] + "\n")
 
-q1 = "Hey Scott, how are you doing today?"
-prompt1 = input("Hey Scott, how are you doing today?\n")
+q1 = "Hey, how are you feeling today?"
+prompt1 = input("Hey, how are you feeling today?\n")
 intro(q1, prompt1)
-prompt2 = input("\nWhat are doing today?\n")
-intro("\nWhat are doing today?\n", prompt2)
-prompt3 = input("\nHow long are you working for?\n")
-prompt4 = input("\nAnd how long do you want stress level updates?\n")
-print("Great, thanks Scott! Good luck!")
+prompt2 = input("\nCan I measure your stress levels and generate a visual representation based on the data?\n")
+intro("\nCan I measure your stress levels and generate a visual representation based on the data?\n", prompt2)
 
-painter = MyGPTPainter(run_length=int(prompt3), interval_length=int(prompt4), verbose=False)
+prompt3 = input("\nHow long do you want the session to run (in minutes)?\n")
+prompt4 = input("\nHow frequently do you want stress level updates (in minutes)?\n")
+print("Great, thanks! Let's begin measuring your stress and generating visuals!")
 
-# Generate a painting based on the stress level
+painter = MyGPTPainter(run_length=int(prompt3) * 60, interval_length=int(prompt4) * 60, verbose=False) 
+
 generate_painting(painter.health_average, num_shapes=20)
 
 GPT_Generic = generic_BCI(clf, transformer=gen_tfrm, action=painter.updateHealth, calibrator=clb)
